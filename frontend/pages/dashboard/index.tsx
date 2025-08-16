@@ -39,15 +39,17 @@ export default function Dashboard() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4 }}>
+    <Container maxWidth="md" sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ width: '100%' }}>
         <Card sx={{ p: 3, boxShadow: 3, borderRadius: 3 }}>
           <Box display="flex" alignItems="center" gap={2}>
             <Avatar src={profile?.profilePicture} sx={{ width: 64, height: 64 }}>
               {profile?.firstName?.[0]}
             </Avatar>
             <Box>
-              <Typography variant="h4" gutterBottom>Welcome, {profile?.firstName}!</Typography>
+              <Typography variant="h4" gutterBottom>
+                Welcome, {profile?.firstName ? profile.firstName : ''}{profile?.lastName ? ` ${profile.lastName}` : ''}!
+              </Typography>
               <Typography variant="body1">Email: {profile?.email}</Typography>
               <Typography variant="body1">User Type: {profile?.userType}</Typography>
               <Typography variant="body2" color="text.secondary">Points: {profile?.points} | Certificates: {profile?.certificatesEarned} | Peer Reviews: {profile?.peerReviewsGiven}</Typography>
@@ -57,7 +59,7 @@ export default function Dashboard() {
             <Button variant="contained" color="primary" onClick={() => router.push('/cases')}>View Cases</Button>
             <Button variant="contained" color="secondary" onClick={() => router.push('/certificates')}>My Certificates</Button>
             <Button variant="contained" color="success" onClick={() => router.push('/peer-reviews')}>Peer Reviews</Button>
-            <Button variant="outlined" color="primary" onClick={() => router.push('/auth/change-password')}>Change Password</Button>
+            {/* Change Password button removed as requested */}
           </Box>
         </Card>
       </Box>

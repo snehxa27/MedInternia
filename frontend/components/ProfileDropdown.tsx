@@ -37,11 +37,13 @@ const ProfileDropdown = ({
   const userId = "me";
   // Logout logic
   const logout = () => {
-    // Clear tokens/session (example: localStorage)
-    localStorage.removeItem("authToken");
-    // Add any other session clearing logic here
-    handleClose();
-    onNavigate("/auth/login");
+  // Clear tokens/session (example: localStorage)
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  // Add any other session clearing logic here
+  handleClose();
+  onNavigate("/");
   };
 
   return (
@@ -52,7 +54,27 @@ const ProfileDropdown = ({
         aria-label="Profile"
         sx={{ ml: 2 }}
       >
-        <Avatar src="/profile-icon.png" />
+        {/* Initial in styled Box (no Avatar, SSR safe) */}
+        <Box
+          sx={{
+            bgcolor: '#bdbdbd',
+            color: '#fff',
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 700,
+            fontSize: 22,
+            mr: 1,
+          }}
+        >
+          {/* SSR safe: get initial from name if available, else U */}
+          {(typeof window !== 'undefined')
+            ? ((localStorage.getItem('name') || 'U')[0].toUpperCase())
+            : 'U'}
+        </Box>
         <ArrowDropDownIcon />
       </IconButton>
       <Menu

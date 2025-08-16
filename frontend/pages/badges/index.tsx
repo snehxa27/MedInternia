@@ -25,15 +25,17 @@ export default function Badges() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom>Badges</Typography>
+    <Container maxWidth="md" sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ width: '100%', textAlign: 'center' }}>
+        <Typography variant="h3" fontWeight={900} color="#1565c0" gutterBottom>Badges</Typography>
         {badges.length === 0 ? (
           <Typography>No badges found.</Typography>
         ) : (
-          badges.map(b => (
-            <BadgeCard key={b._id} badge={b} />
-          ))
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3, mt: 4 }}>
+            {badges.map(b => (
+              <BadgeCard key={b._id} badge={b} />
+            ))}
+          </Box>
         )}
       </Box>
     </Container>

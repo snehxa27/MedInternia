@@ -28,9 +28,9 @@ export default function Leaderboard() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom>Leaderboard</Typography>
+    <Container maxWidth="md" sx={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ width: '100%' }}>
+        <Typography variant="h3" fontWeight={900} color="#1565c0" gutterBottom>Leaderboard</Typography>
         <LeaderboardTable leaders={leaders} />
       </Box>
     </Container>

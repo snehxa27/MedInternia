@@ -32,27 +32,33 @@ export default function Navbar({ route }: { route?: string }) {
   const router = useRouter();
   // Role-based dashboard navigation
   const handleHomeNav = () => {
-    // Try to get role from localStorage (adjust if you use context/auth)
-    let role = '';
+    // If logged in, always go to dashboard; else go to main page
     if (typeof window !== 'undefined') {
-      role = localStorage.getItem('role') || '';
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role') || '';
+      // Only route to dashboard if logged in
+      if (token) {
+        switch (role) {
+          case 'doctor':
+            router.push('/dashboard/doctor');
+            return;
+          case 'patient':
+            router.push('/dashboard/patient');
+            return;
+          case 'intern':
+            router.push('/dashboard/intern');
+            return;
+          case 'admin':
+            router.push('/dashboard/admin');
+            return;
+          default:
+            router.push('/dashboard');
+            return;
+        }
+      }
     }
-    switch (role) {
-      case 'doctor':
-        router.push('/dashboard/doctor');
-        break;
-      case 'patient':
-        router.push('/dashboard/patient');
-        break;
-      case 'intern':
-        router.push('/dashboard/intern');
-        break;
-      case 'admin':
-        router.push('/dashboard/admin');
-        break;
-      default:
-        router.push('/');
-    }
+    // If not logged in, always go to main page
+    router.push('/');
   };
   // More dropdown state
   const [moreAnchorEl, setMoreAnchorEl] = React.useState<null | HTMLElement>(
@@ -150,7 +156,7 @@ export default function Navbar({ route }: { route?: string }) {
                   onBlur={() =>
                     setTimeout(() => setShowSuggestions(false), 150)
                   }
-                  placeholder="Search medical cases, jobs, or webinars…"
+                  placeholder="   Search medical cases, jobs, or webinars…"
                   aria-label="Search medical content"
                   style={{
                     width: "100%",
@@ -173,8 +179,10 @@ export default function Navbar({ route }: { route?: string }) {
                       "linear-gradient(90deg, #1de9b6 0%, #2193b0 100%)",
                     borderRadius: "50%",
                     boxShadow: "0 2px 8px #2193b044",
-                    width: 40,
-                    height: 40,
+                    width: 32,
+                    height: 32,
+                    minWidth: 32,
+                    minHeight: 32,
                     p: 0,
                     transition: "transform 0.2s, box-shadow 0.2s",
                     "&:hover": {
@@ -187,7 +195,7 @@ export default function Navbar({ route }: { route?: string }) {
                   aria-label="Search medical content"
                   title="Search"
                 >
-                  <SearchIcon sx={{ color: "#fff", fontSize: 22 }} />
+                  <SearchIcon sx={{ color: "#fff", fontSize: 18 }} />
                 </IconButton>
                 {/* Suggestions dropdown */}
                 {showSuggestions && (
@@ -213,11 +221,11 @@ export default function Navbar({ route }: { route?: string }) {
                       <Box
                         key={item}
                         sx={{
-                          px: 2,
+                          px: 4,
                           py: 1,
                           borderRadius: 2,
                           cursor: "pointer",
-                          fontSize: "1rem",
+                          fontSize: "0.92rem",
                           color: "#1565c0",
                           "&:hover": { background: "#e0eafc" },
                         }}
@@ -459,13 +467,14 @@ export default function Navbar({ route }: { route?: string }) {
               anchorEl={moreAnchorEl}
               open={moreOpen}
               onClose={handleMoreClose}
-              PaperProps={{ sx: { minWidth: 160, borderRadius: 2 } }}
+              PaperProps={{ sx: { minWidth: 160, borderRadius: 2, textAlign: 'center' } }}
             >
               <MenuItem
                 onClick={() => {
                   handleMoreClose();
                   router.push("/resources");
                 }}
+                sx={{ justifyContent: 'center' }}
               >
                 Resources
               </MenuItem>
@@ -474,16 +483,18 @@ export default function Navbar({ route }: { route?: string }) {
                   handleMoreClose();
                   router.push("/leaderboard");
                 }}
+                sx={{ justifyContent: 'center' }}
               >
                 Leaderboard
               </MenuItem>
               <MenuItem
                 onClick={() => {
                   handleMoreClose();
-                  router.push("/patients");
+                  router.push("/badges");
                 }}
+                sx={{ justifyContent: 'center' }}
               >
-                Patients
+                Badges
               </MenuItem>
             </Menu>
             <IconButton

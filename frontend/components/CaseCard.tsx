@@ -16,72 +16,80 @@ export default function CaseCard({ caseData }: { caseData: any }) {
     <Card
       sx={{
         mb: 3,
-        borderRadius: 3,
+        borderRadius: 4,
         background: "linear-gradient(120deg, #f8f9fa 0%, #e0eafc 100%)",
         boxShadow: "0 2px 12px #2193b022",
-        transition: "box-shadow 0.2s, transform 0.2s",
-        "&:hover": {
-          boxShadow: "0 6px 24px #2193b044",
-          transform: "scale(1.02)",
+        transition: "box-shadow 0.3s, transform 0.3s",
+        '&:hover': {
+          boxShadow: '0 8px 32px #2193b044',
+          transform: 'scale(1.025)',
         },
-        p: 2,
-        display: "flex",
-        flexDirection: "column",
-        gap: 1.5,
+        p: 2.5,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        animation: 'fadeInCard 0.7s',
       }}
     >
       <CardContent sx={{ p: 0 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-          <Typography fontSize={24} sx={{ color: accent.color }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+          <Typography fontSize={28} sx={{ color: accent.color }}>
             {accent.icon}
           </Typography>
           <Typography
-            variant="h6"
-            fontWeight={700}
+            variant="h5"
+            fontWeight={800}
             color="#1565c0"
-            sx={{ flex: 1 }}
+            sx={{ flex: 1, letterSpacing: 0.5 }}
           >
-            {caseData?.title || "Untitled Case"}
+            {caseData?.title || 'Untitled Case'}
           </Typography>
           <Box
             sx={{
-              px: 1.5,
-              py: 0.5,
+              px: 2,
+              py: 0.7,
               borderRadius: 2,
               background: accent.color,
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 14,
+              boxShadow: '0 1px 4px #2193b022',
             }}
           >
             {status}
           </Box>
         </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-          {caseData?.description || "No description provided."}
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2, fontWeight: 500, fontSize: '1.08rem' }}>
+          {caseData?.description || 'No description provided.'}
         </Typography>
         <Button
           variant="contained"
           sx={{
-            borderRadius: 2,
-            px: 3,
-            fontWeight: 600,
+            borderRadius: 3,
+            px: 4,
+            py: 1.1,
+            fontWeight: 700,
+            fontSize: '1.05rem',
             background: accent.color,
-            color: "#fff",
-            boxShadow: "0 1px 4px #2193b022",
+            color: '#fff',
+            boxShadow: '0 2px 8px #2193b044',
             mt: 1,
-            "&:hover": {
-              background: "#1565c0",
-              color: "#fff",
-              boxShadow: "0 2px 8px #2193b044",
+            transition: 'all 0.2s',
+            '&:hover': {
+              background: '#1565c0',
+              color: '#fff',
+              boxShadow: '0 4px 16px #2193b066',
             },
           }}
           component={Link}
-          href={caseData?._id ? `/cases/${caseData._id}` : "#"}
+          href={caseData?._id ? `/cases/${caseData._id}` : '#'}
         >
           View Details
         </Button>
       </CardContent>
+      <style jsx global>{`
+        @keyframes fadeInCard { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+      `}</style>
     </Card>
   );
 }
