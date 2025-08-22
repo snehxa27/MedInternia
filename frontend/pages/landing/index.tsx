@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { badges } from '../../utils/badges';
 import {
   Heart,
   MessageCircle,
@@ -47,7 +48,13 @@ const ProfileSidebar = () => {
       apiModule.default.get(`/users/${userId}/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
-        setUser(res.data.data.user);
+        // Ensure correct extraction of counts from backend response
+        const userData = res.data?.data?.user || res.data?.user || res.data;
+        setUser({
+          ...userData,
+          followersCount: userData.followersCount ?? (Array.isArray(userData.followers) ? userData.followers.length : undefined),
+          followingCount: userData.followingCount ?? (Array.isArray(userData.following) ? userData.following.length : undefined),
+        });
       });
     });
   }, []);
@@ -142,7 +149,7 @@ const ProfileSidebar = () => {
     >
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#0ea5e9" }}>
-          1,245
+          {user?.followersCount ?? '...'}
         </div>
         <a href="/profile/connections" style={{ textDecoration: 'none' }}>
           <div style={{ fontSize: 12, color: "#64748b", cursor: 'pointer' }}>Followers</div>
@@ -150,7 +157,7 @@ const ProfileSidebar = () => {
       </div>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: "#10b981" }}>
-          980
+          {user?.followingCount ?? '...'}
         </div>
         <a href="/profile/connections" style={{ textDecoration: 'none' }}>
           <div style={{ fontSize: 12, color: "#64748b", cursor: 'pointer' }}>Following</div>
@@ -200,29 +207,21 @@ const ProfileSidebar = () => {
       >
         Badges & Achievements
       </h3>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {[
-          // { name: "Expert Cardiologist", color: "#10b981" },
-          { name: "Top Contributor", color: "#0ea5e9" },
-          { name: "Research Pioneer", color: "#8b5cf6" },
-          { name: "Mentor", color: "#f59e0b" },
-        ].map((badge, idx) => (
-          <div
-            key={idx}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 12px",
-              backgroundColor: badge.color + "20",
-              borderRadius: 8,
-              border: `1px solid ${badge.color}30`,
-            }}
-          >
-            <Award size={16} color={badge.color} />
-            <span style={{ fontSize: 14, color: badge.color, fontWeight: 500 }}>
-              {badge.name}
-            </span>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+        {badges.filter(b => b.unlocked).map((badge, idx) => (
+          <div key={badge.id} style={{ position: 'relative', width: 60, height: 60 }}>
+            <img
+              src={badge.image.src}
+              alt={badge.name}
+              style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                boxShadow: '0 2px 8px #2193b022',
+                border: '2px solid #e0e7ef',
+              }}
+            />
           </div>
         ))}
       </div>
@@ -287,7 +286,7 @@ const ProfileSidebar = () => {
       </div>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 24, fontWeight: 700, color: "#0ea5e9" }}>
-          156
+          2
         </div>
         <div style={{ fontSize: 12, color: "#64748b" }}>Cases</div>
       </div>
@@ -1053,6 +1052,8 @@ type Doctor = {
   education?: string;
   location?: string;
   experience?: string;
+  followersCount?: number;
+  followingCount?: number;
 };
 
 const RecommendedConnections = () => {

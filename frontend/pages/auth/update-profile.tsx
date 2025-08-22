@@ -7,7 +7,8 @@ export default function UpdateProfile() {
   const [form, setForm] = useState({
     firstName: '',
     phone: '',
-    address: { city: '', state: '' }
+    address: { city: '', state: '' },
+    profilePicture: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -19,17 +20,20 @@ export default function UpdateProfile() {
       router.push('/auth/login');
       return;
     }
-    api.get('/auth/profile', {
+    const userId = localStorage.getItem('userId');
+    api.get(`/users/${userId}/profile`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
+        const user = res.data.data?.user || res.data;
         setForm({
-          firstName: res.data.firstName || '',
-          phone: res.data.phone || '',
+          firstName: user.firstName || '',
+          phone: user.phone || '',
           address: {
-            city: res.data.address?.city || '',
-            state: res.data.address?.state || ''
-          }
+            city: user.address?.city || '',
+            state: user.address?.state || ''
+          },
+          profilePicture: user.profilePicture || ''
         });
       })
       .catch(() => {});
@@ -62,6 +66,16 @@ export default function UpdateProfile() {
   return (
     <Container maxWidth="sm">
       <Box sx={{ my: 4 }}>
+        {/* Show profile image if available */}
+        {form.profilePicture && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <img
+              src={form.profilePicture}
+              alt="Profile"
+              style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '2px solid #bdbdbd' }}
+            />
+          </Box>
+        )}
         <Typography variant="h4" gutterBottom>Update Profile</Typography>
         {error && <Alert severity="error">{error}</Alert>}
         {success && <Alert severity="success">{success}</Alert>}

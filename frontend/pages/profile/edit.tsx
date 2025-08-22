@@ -1,4 +1,5 @@
 import React, { useState, FormEvent, ChangeEvent, useRef, useEffect } from "react";
+import { useRouter } from 'next/router';
 import {
   Box,
   Typography,
@@ -152,9 +153,9 @@ const ROLE_AVATARS = {
 
 // Define the initial state of the form
 const initialFormState: ProfileFormData = {
-  name: "Dr. Me",
-  bio: "Passionate about medicine.",
-  email: "me@medinternia.com",
+  name: "",
+  bio: "",
+  email: "",
   phone: "",
   address: {
     street: "",
@@ -175,6 +176,8 @@ const initialFormState: ProfileFormData = {
 };
 
 export default function EditProfilePage() {
+
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // State to manage form data, initialized with placeholder values
@@ -201,7 +204,7 @@ export default function EditProfilePage() {
     if (!hasCustomImage) {
       setForm(prevForm => ({
         ...prevForm,
-        image: ROLE_AVATARS[prevForm.role],
+        image: prevForm.image || ROLE_AVATARS[prevForm.role],
       }));
     }
   }, [form.role, hasCustomImage]);
@@ -225,6 +228,51 @@ export default function EditProfilePage() {
     setErrors(newErrors);
     return isValid;
   };
+   React.useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        if (!token || !userId) return;
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+        const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (data.success && data.data && data.data.user) {
+          const user = data.data.user;
+          setForm(prevForm => ({
+            ...prevForm,
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+            bio: user.bio || "",
+            email: user.email || "",
+            phone: user.phone || "",
+            address: {
+              street: user.address?.street || "",
+              city: user.address?.city || "",
+              state: user.address?.state || "",
+              zip: user.address?.zipCode || "",
+            },
+            image: user.profilePicture || ROLE_AVATARS[user.userType === "doctor" ? "Doctor" : user.userType === "intern" ? "Intern" : "Patient"],
+            role: user.userType === "doctor" ? "Doctor" : user.userType === "intern" ? "Intern" : "Patient",
+            medicalSchool: user.medicalSchool || "",
+            graduationYear: user.yearOfStudy || "",
+            specialtiesOfInterest: user.interests || "",
+            linkedInUrl: user.linkedInProfile || "",
+            medicalLicenseNumber: user.licenseNumber || "",
+            specialtyExpertise: user.specialization || "",
+            hospitalAffiliation: user.hospitalAffiliation || "",
+            yearsOfExperience: user.experience || "",
+          }));
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchProfile();
+  }, []);
 
   // Handles input changes for top-level form fields
   const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -285,12 +333,52 @@ export default function EditProfilePage() {
 
     setLoading(true);
     try {
-      // Simulates an API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setMessage("Profile updated successfully!");
-      setIsSaved(true);
-      // Clears the "Saved" checkmark after 3 seconds
-      setTimeout(() => setIsSaved(false), 3000);
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (!token || !userId) throw new Error('Missing auth');
+      // Prepare payload for backend
+      const payload = {
+        firstName: form.name.split(' ')[0] || '',
+        lastName: form.name.split(' ').slice(1).join(' ') || '',
+        bio: form.bio,
+        phone: form.phone,
+        address: {
+          street: form.address.street,
+          city: form.address.city,
+          state: form.address.state,
+          zipCode: form.address.zip,
+        },
+  profilePicture: (typeof form.image === 'string' && /^https?:\/\//.test(form.image)) ? form.image : '',
+        medicalSchool: form.medicalSchool,
+        yearOfStudy: form.graduationYear ? Number(form.graduationYear) : undefined,
+        interests: Array.isArray(form.specialtiesOfInterest)
+          ? form.specialtiesOfInterest
+          : (typeof form.specialtiesOfInterest === 'string' && form.specialtiesOfInterest.length > 0
+              ? form.specialtiesOfInterest.split(',').map(s => s.trim()).filter(Boolean)
+              : []),
+        licenseNumber: form.medicalLicenseNumber,
+        specialization: form.specialtyExpertise,
+        hospitalAffiliation: form.hospitalAffiliation,
+        experience: form.yearsOfExperience ? Number(form.yearsOfExperience) : undefined,
+        linkedInProfile: form.linkedInUrl,
+      };
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api';
+      const res = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMessage("Profile updated successfully!");
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 3000);
+      } else {
+        setMessage(data.message || "Failed to update profile.");
+      }
     } catch (error) {
       console.error("Update failed:", error);
       setMessage("An error occurred. Please try again.");
@@ -343,31 +431,52 @@ export default function EditProfilePage() {
       >
         <Card sx={{ p: 4, width: '100%', maxWidth: 650, borderRadius: '20px' }}>
           {/* Profile Header Section */}
-          <Box display="flex" alignItems="center" flexDirection="column" gap={2} mb={4}>
-            <Box sx={{ position: 'relative', width: 120, height: 120 }}>
+          <Box display="flex" alignItems="center" flexDirection="column" gap={3} mb={5}>
+            <Box sx={{ position: 'relative', width: 130, height: 130, mb: 1 }}>
               <Avatar
-                src={form.image}
-                sx={{ width: 120, height: 120, border: '4px solid #fff', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
-              />
+                src={
+                  form.image && !form.image.startsWith('data:image/svg+xml') && form.image !== ''
+                  ? form.image
+                  : undefined
+                }
+                sx={{
+                  width: 130,
+                  height: 130,
+                  border: '5px solid #fff',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.12)',
+                  fontSize: 44,
+                  bgcolor: '#2193b0',
+                  color: '#fff',
+                  transition: 'box-shadow 0.3s',
+                }}
+              >
+                {(!form.image || form.image.startsWith('data:image/svg+xml') || form.image === '') &&
+                  form.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
+              </Avatar>
               <Tooltip title="Change profile picture">
                 <Box
                   component="div"
                   sx={{
                     position: 'absolute',
-                    bottom: 0,
-                    right: 0,
+                    bottom: 10,
+                    right: 10,
                     bgcolor: 'primary.main',
                     color: 'white',
                     p: 1.5,
                     borderRadius: '50%',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'transform 0.2s ease-in-out',
                     '&:hover': {
-                      transform: 'scale(1.1)'
+                      transform: 'scale(1.12)'
                     }
                   }}
                   onClick={() => setOpenImageMenu(true)}
@@ -384,9 +493,8 @@ export default function EditProfilePage() {
                 onChange={handleImageChange}
               />
             </Box>
-            
-            <Box display="flex" flexDirection="column" alignItems="center">
-              <Typography variant="h5" sx={{ mb: 0.5 }}>
+            <Box display="flex" flexDirection="column" alignItems="center" mt={1}>
+              <Typography variant="h5" sx={{ mb: 0.5, letterSpacing: 0.5, fontWeight: 700 }}>
                 Edit Profile
               </Typography>
             </Box>
@@ -579,7 +687,12 @@ export default function EditProfilePage() {
               <KeyIcon /> Password & Privacy
             </Typography>
             <Stack spacing={2} mb={4}>
-              <Button variant="outlined" color="primary" fullWidth>
+              <Button
+                  variant="outlined"
+                  color="primary"
+                  fullWidth
+                  onClick={() => router.push('/auth/change-password')}
+                >
                 Change Password
               </Button>
             </Stack>

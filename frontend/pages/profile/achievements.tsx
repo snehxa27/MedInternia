@@ -73,7 +73,7 @@ const achievements: Achievement[] = [
   },
   {
     id: 4,
-    name: "Quiz Pro",
+    name: "Knowledge Master",
     icon: <CelebrationIcon sx={{ color: "#ff9800" }} />,
     progress: 100,
     unlocked: true,

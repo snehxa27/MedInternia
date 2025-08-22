@@ -33,8 +33,22 @@ const ProfileDropdown = ({
     setAnchorEl(null);
   };
 
-  // TODO: Replace with actual userId from context/auth
-  const userId = "me";
+  // Get userId from localStorage
+  const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : '';
+
+  // Fetch user profile data from backend using axios
+  const [profile, setProfile] = useState<any>(null);
+  React.useEffect(() => {
+    if (!userId) return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    import('../utils/api').then(({ default: api }) => {
+      api.get(`/users/${userId}/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => setProfile(res.data?.user || null))
+        .catch(() => setProfile(null));
+    });
+  }, [userId]);
   // Logout logic
   const logout = () => {
   // Clear tokens/session (example: localStorage)
@@ -54,27 +68,28 @@ const ProfileDropdown = ({
         aria-label="Profile"
         sx={{ ml: 2 }}
       >
-        {/* Initial in styled Box (no Avatar, SSR safe) */}
-        <Box
-          sx={{
-            bgcolor: '#bdbdbd',
-            color: '#fff',
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 700,
-            fontSize: 22,
-            mr: 1,
-          }}
-        >
-          {/* SSR safe: get initial from name if available, else U */}
-          {(typeof window !== 'undefined')
-            ? ((localStorage.getItem('name') || 'U')[0].toUpperCase())
-            : 'U'}
-        </Box>
+        {/* Show avatar if available, else initial */}
+        {profile && profile.profilePicture ? (
+          <Avatar src={profile.profilePicture} sx={{ width: 40, height: 40, mr: 1 }} />
+        ) : (
+          <Box
+            sx={{
+              bgcolor: '#bdbdbd',
+              color: '#fff',
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: 22,
+              mr: 1,
+            }}
+          >
+            {profile && profile.firstName ? profile.firstName[0].toUpperCase() : 'U'}
+          </Box>
+        )}
         <ArrowDropDownIcon />
       </IconButton>
       <Menu
