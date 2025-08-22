@@ -90,6 +90,7 @@ export default function CreateWebinar() {
               name="title"
               fullWidth
               margin="normal"
+              
               value={form.title}
               onChange={handleChange}
               required
