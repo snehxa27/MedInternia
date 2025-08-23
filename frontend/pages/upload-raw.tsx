@@ -375,7 +375,7 @@ export default function UploadRawPage() {
       {/* Grouped cases by doctor section */}
       <Box sx={{ maxWidth: 1100, mx: "auto" }}>
         <Typography variant="h5" fontWeight={800} mb={2} color="#222">
-          Your Medical Cases (Grouped by Doctor)
+          Your Medical Cases
         </Typography>
         <Stack spacing={4}>
           {groupedCases.map((group, idx) => (
@@ -383,8 +383,8 @@ export default function UploadRawPage() {
               <Box display="flex" alignItems="center" gap={2} mb={1}>
                 <Avatar src={group.doctorPhoto} sx={{ width: 40, height: 40 }} />
                 <Box>
-                  <Typography fontWeight={700} fontSize={18}>{group.doctor}</Typography>
-                  <Typography fontSize={14} color="#888">{group.doctorSpecialization}</Typography>
+                  <Typography fontWeight={700} fontSize={18}>{group.cases[0]?.description?.split('.')[1]?.trim() || group.cases[0]?.description?.split('.')[0]?.trim() || 'Medical Situation'}</Typography>
+                  <Typography fontSize={14} color="#888">Medical Situation</Typography>
                 </Box>
               </Box>
               <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
