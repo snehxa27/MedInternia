@@ -211,6 +211,7 @@ const DiariesPage: React.FC = () => {
         .med-blue {
           color: #3fdde6ff !important;
         }
+          
         .med-bg {
           background: #fafdff;
         }
