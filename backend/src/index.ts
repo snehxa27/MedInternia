@@ -5,8 +5,6 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import connectDB from './utils/database';
 import { createDefaultBadges } from './utils/createDefaultBadges';
-
-// Import routes
 import apiRoutes from './routes/api';
 
 dotenv.config();
@@ -55,7 +53,7 @@ app.use(cors({
 }));
 
 // Ensure preflight OPTIONS requests are handled for all routes
-app.options('*', cors({ origin: allowedOrigins, optionsSuccessStatus: 204 }));
+app.options(/.*/, cors({ origin: allowedOrigins, optionsSuccessStatus: 204 }));
 app.use(morgan('combined'));
 
 // Serve uploads folder for profile images

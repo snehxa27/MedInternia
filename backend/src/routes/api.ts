@@ -1,4 +1,4 @@
-﻿import videoRoutes from './video';
+import videoRoutes from './video';
 import researchPaperRoutes from './researchPapers';
 import { Router, Request, Response } from 'express';
 import authRoutes from './auth';
@@ -55,49 +55,20 @@ router.get('/test', (req: Request, res: Response) => {
   });
 });
 
-// Auth routes
 router.use('/auth', authRoutes);
-
-// Video conferencing routes
 router.use('/video', videoRoutes);
-
-// User routes
 router.use('/users', userRoutes);
-
-// Patient routes
 router.use('/patients', patientRoutes);
-
-// Doctor routes
 router.use('/doctors', doctorRoutes);
-
-// Case routes
 router.use('/cases', caseRoutes);
-
-// Badge routes
 router.use('/badges', badgeRoutes);
-
-// Peer review routes
 router.use('/peer-reviews', peerReviewRoutes);
-
-// Job opportunity routes
 router.use('/jobs', jobRoutes);
-
-// Certificate routes
 router.use('/certificates', certificateRoutes);
-
-// Webinar routes
 router.use('/webinars', webinarRoutes);
-
-// Notification routes
 router.use('/notifications', notificationRoutes);
-
-// Integration routes (LinkedIn, GitHub)
 router.use('/integration', integrationRoutes);
-
-// Enhanced features routes (leaderboard, search, etc.)
 router.use('/', enhancedRoutes);
-
-// Research paper routes
 router.use('/research-papers', researchPaperRoutes);
 
 export default router;
