@@ -1,4 +1,4 @@
-import QRCode from "qrcode.react";
+// removed unused qrcode.react import (caused TypeScript default-export error)
 import {
   Container,
   Typography,
