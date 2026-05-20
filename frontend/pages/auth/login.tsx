@@ -120,6 +120,7 @@ export default function Login() {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
                     edge="end"
