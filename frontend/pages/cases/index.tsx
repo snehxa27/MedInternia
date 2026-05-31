@@ -52,9 +52,21 @@ export default function Cases() {
       .catch(() => setCanCreateCases(false));
   }, []);
 
-  if (loading) {
-    return <CircularProgress />;
-  }
+  if (loading)
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        minHeight: "100vh",
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  );
+  
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }

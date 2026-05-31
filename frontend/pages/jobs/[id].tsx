@@ -35,12 +35,30 @@ export default function JobDetail() {
     }
   };
 
-  if (loading) return <CircularProgress />;
+ if (loading)
+  return (
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: "80vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress size={60} />
+    </Container>
+  );
   if (error) return <Alert severity="error">{error}</Alert>;
   if (!job) return null;
 
   return (
-    <Container maxWidth="sm">
+    <Container
+  maxWidth="sm"
+  sx={{
+        minHeight: "130vh",
+  }}
+>
       <Box sx={{ my: 4 }}>
         <Card>
           <CardContent>

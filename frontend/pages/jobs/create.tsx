@@ -46,12 +46,13 @@ export default function CreateJob() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 }, minHeight: "calc(100vh - 64px)" }}>
+
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" gutterBottom>Create Job Opportunity</Typography>
         {error && <Alert severity="error">{error}</Alert>}
         {success && <Alert severity="success">{success}</Alert>}
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit}>
           <TextField label="Title" name="title" fullWidth margin="normal" value={form.title} onChange={handleChange} required />
           <TextField label="Description" name="description" fullWidth margin="normal" value={form.description} onChange={handleChange} required multiline rows={4} />
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
