@@ -240,8 +240,13 @@ export default function Register() {
       if (!payload.dateOfBirth) delete payload.dateOfBirth;
       if (!payload.gender) delete payload.gender;
 
-      await api.post('/auth/register', payload);
-      router.push('/auth/login');
+      const res=await api.post('/auth/register', payload);
+      const user = res.data.data.user;
+      localStorage.setItem('token', res.data.data.token);
+      localStorage.setItem('userId', user._id || user.id);
+      localStorage.setItem('user', JSON.stringify(user));
+        
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
