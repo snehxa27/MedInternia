@@ -154,5 +154,6 @@ WebinarSchema.index({ specialization: 1 });
 WebinarSchema.index({ scheduledAt: 1 });
 WebinarSchema.index({ status: 1 });
 WebinarSchema.index({ 'participants.user': 1 });
+WebinarSchema.index({ status: 1, scheduledAt: 1 });
 
 export default mongoose.model<IWebinar>('Webinar', WebinarSchema);

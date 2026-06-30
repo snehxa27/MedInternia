@@ -92,15 +92,24 @@ export const createWebinar = async (req: AuthRequest, res: Response) => {
     // Ensure webinar.host is a populated document
     const host = webinar.host as any;
 
-    // Notify all interns about the new webinar
-    const interns = await User.find({ userType: 'intern' });
-      const notifications = interns.map(intern => ({
-        recipient: intern._id,
-        message: `New webinar scheduled: ${webinar.title} by ${host.firstName} ${host.lastName}`,
-        type: 'webinar',
-        link: webinar.meetingLink
-      }));
-    await Notification.insertMany(notifications);
+    // Respond immediately — notify interns asynchronously in batches
+    setImmediate(async () => {
+      try {
+        const internIds = await User.find({ userType: 'intern' }).select('_id');
+        const batchSize = 500;
+        for (let i = 0; i < internIds.length; i += batchSize) {
+          const batch = internIds.slice(i, i + batchSize).map(intern => ({
+            recipient: intern._id,
+            message: `New webinar scheduled: ${webinar.title} by ${host.firstName} ${host.lastName}`,
+            type: 'webinar',
+            link: webinar.meetingLink
+          }));
+          await Notification.insertMany(batch);
+        }
+      } catch (notifyErr) {
+        console.error('Failed to send webinar notifications:', notifyErr);
+      }
+    });
 
     res.status(201).json({
       success: true,
